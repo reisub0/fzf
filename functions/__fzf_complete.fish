@@ -39,7 +39,7 @@ function __fzf_complete -d 'fzf completion and print selection back to commandli
     end
 
     set -l cmd_lastw $cmd[-1]
-    set cmd (string join -- ' ' $cmd)
+    set cmd (string join -- ' ' $cmd '')
 
     set -l initial_query ''
     test -n "$cmd_lastw"; and set initial_query --query="$cmd_lastw"
@@ -58,9 +58,10 @@ function __fzf_complete -d 'fzf completion and print selection back to commandli
 
         set -l query
         string join -- \n $complist \
-        | eval (__fzfcmd) (string escape --no-quoted -- $initial_query) --print-query (__fzf_complete_opts) \
-        | cut -f1 \
-        | while read -l r
+            | eval (__fzfcmd) (string escape --no-quoted -- $initial_query) --print-query (__fzf_complete_opts) \
+            | cut -f1 \
+            | string escape \
+            | while read -l r
             # first line is the user entered query
             if test -z "$query"
                 set query $r
@@ -109,7 +110,7 @@ function __fzf_complete_opts_common
     if set -q FZF_DEFAULT_OPTS
         echo $FZF_DEFAULT_OPTS
     end
-    echo --cycle --reverse --inline-info
+    echo --cycle --reverse --inline-info -1 -0
 end
 
 function __fzf_complete_opts_tab_accepts
